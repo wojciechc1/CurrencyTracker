@@ -2,7 +2,7 @@ from data_fetcher import ECBDataAPI, NBPDataAPI
 import argparse
 
 
-def main(date_start: str, date_end: str, overwrite: bool):
+def main(date_start: str, date_end: str, overwrite: str):
 
     # config
     date_start = "2025-09-10" if date_start is None else date_start
@@ -21,11 +21,11 @@ def main(date_start: str, date_end: str, overwrite: bool):
     nbp_rates = nbp_api.parse_data(nbp_data)
     ecb_rates = ecb_api.parse_data(ecb_data)
 
-    if overwrite:
+    if overwrite == "True":
         # save (overwrite) to the file
         nbp_api.save_data(nbp_rates)
         ecb_api.save_data(ecb_rates)
-    elif not overwrite:
+    elif overwrite == "False":
         # save (merge) to the file
         nbp_api.merge_data(nbp_rates)
         ecb_api.merge_data(ecb_rates)
@@ -34,9 +34,9 @@ def main(date_start: str, date_end: str, overwrite: bool):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Currency Tracker")
-    parser.add_argument("date_start", help="Date start in format: YYYY-MM-DD")
-    parser.add_argument("date_end", help="Date end in format: YYYY-MM-DD")
+    parser.add_argument("-from_date", help="Date start in format: YYYY-MM-DD")
+    parser.add_argument("-to_date", help="Date end in format: YYYY-MM-DD")
     parser.add_argument("overwrite", help="True if you want to overwrite files; False if you want to append data to existing files")
     args = parser.parse_args()
 
-    main(args.date_start, args.date_end, args.overwrite)
+    main(args.from_date, args.to_date, args.overwrite)
