@@ -1,7 +1,7 @@
 import os
 import requests
 import xml.etree.ElementTree as ET
-
+from abc import ABC, abstractmethod
 
 class DataAPI:
     def __init__(self, url, name):
@@ -9,7 +9,8 @@ class DataAPI:
         self.file_name = name
         self.save_dir = self.create_save_dir("data")
 
-    def create_save_dir(self, folder_path):
+    @staticmethod
+    def create_save_dir(folder_path):
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
         return folder_path
@@ -48,8 +49,7 @@ class DataAPI:
         tree = ET.ElementTree(root)
         tree.write(file_path, encoding="utf-8", xml_declaration=True)
 
-
-
+    @abstractmethod
     def parse_data(self, data):
         """To overwrite"""
         raise NotImplementedError

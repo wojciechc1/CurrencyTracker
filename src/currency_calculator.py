@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as ET
 
+
 class CurrencyCalculator:
     def __init__(self, nbp_file, ecb_file):
         self.nbp_file = nbp_file
