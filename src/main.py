@@ -1,26 +1,42 @@
 from data_fetcher import ECBDataAPI, NBPDataAPI
-
-# config
-DATE_START = "2025-09-10"
-DATE_END = "2025-09-11"
+import argparse
 
 
-nbp_api = NBPDataAPI(DATE_START, DATE_END)
-ecb_api = ECBDataAPI(DATE_START, DATE_END)
+def main(date_start: str, date_end: str, overwrite: bool):
 
-# get data
-nbp_data = nbp_api.get_data()
-ecb_data = ecb_api.get_data()
+    # config
+    date_start = "2025-09-10" if date_start is None else date_start
+    date_end = "2025-09-20" if date_end is None else date_end
 
 
-# parse to simple xml format
-nbp_rates = nbp_api.parse_data(nbp_data)
-ecb_rates = ecb_api.parse_data(ecb_data)
+    nbp_api = NBPDataAPI(date_start, date_end)
+    ecb_api = ECBDataAPI(date_start, date_end)
 
-# save (overwrite) to the file
-#nbp_api.save_data(nbp_rates)
-#ecb_api.save_data(ecb_rates)
+    # get data
+    nbp_data = nbp_api.get_data()
+    ecb_data = ecb_api.get_data()
 
-# save (merge) to the file
-nbp_api.merge_data(nbp_rates)
-ecb_api.merge_data(ecb_rates)
+
+    # parse to simple xml format
+    nbp_rates = nbp_api.parse_data(nbp_data)
+    ecb_rates = ecb_api.parse_data(ecb_data)
+
+    if overwrite:
+        # save (overwrite) to the file
+        nbp_api.save_data(nbp_rates)
+        ecb_api.save_data(ecb_rates)
+    elif not overwrite:
+        # save (merge) to the file
+        nbp_api.merge_data(nbp_rates)
+        ecb_api.merge_data(ecb_rates)
+
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Currency Tracker")
+    parser.add_argument("date_start", help="Date start in format: YYYY-MM-DD")
+    parser.add_argument("date_end", help="Date end in format: YYYY-MM-DD")
+    parser.add_argument("overwrite", help="True if you want to overwrite files; False if you want to append data to existing files")
+    args = parser.parse_args()
+
+    main(args.date_start, args.date_end, args.overwrite)

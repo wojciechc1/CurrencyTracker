@@ -2,6 +2,15 @@ import os
 import requests
 import xml.etree.ElementTree as ET
 from abc import ABC, abstractmethod
+import logging
+
+# logger config
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+logger = logging.getLogger(__name__)
 
 class DataAPI:
     def __init__(self, url, name):
@@ -13,12 +22,15 @@ class DataAPI:
     def create_save_dir(folder_path):
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
+            logger.info(f"Created folder: {folder_path}")
         return folder_path
 
     def get_data(self):
         """Download the data from the API"""
+        logger.info(f"Downloading data from {self.url}")
         resp = requests.get(self.url, timeout=5)
         resp.raise_for_status()
+        logger.info(f"Downloaded {len(resp.content)} bytes from {self.url}")
         return resp.text
 
     def save_data(self, data):
@@ -27,27 +39,31 @@ class DataAPI:
         with open(file_path, "w", encoding="utf-8") as f:
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
             f.write(data)
-        print(f"Saved {file_path}")
+        logger.info(f"Saved data to {file_path}")
 
     def merge_data(self, new_data):
         """Append the data to the file XML format"""
         file_path = os.path.join(self.save_dir, f"{self.file_name}.xml")
 
+        logger.info(f"Merging new data into {file_path}")
         tree = ET.parse(file_path)
         root = tree.getroot()
 
         existing_dates = {rate.find("Date").text for rate in root.findall("Rate")}
+        logger.debug(f"Existing dates in file: {existing_dates}")
 
         new_root = ET.fromstring(new_data)
 
+        added = 0
         for rate in new_root.findall("Rate"):
             date = rate.find("Date").text
             if date not in existing_dates:
                 root.append(rate)
-
+                added += 1
         # update file
         tree = ET.ElementTree(root)
         tree.write(file_path, encoding="utf-8", xml_declaration=True)
+        logger.info(f"Merged {added} new records into {file_path}")
 
     @abstractmethod
     def parse_data(self, data):
