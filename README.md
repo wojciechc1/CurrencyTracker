@@ -11,7 +11,14 @@ Currency Tracker is a Python project that fetches historical and current exchang
 
 ## Usage
 1. Set the desired date range.
-2. Run the script to fetch and parse data.
+2. Run 
+```bash
+  # 1. create folder
+  python3 src/main.py -from_date 2025-09-07 -to_date 2025-09-15 True
+  
+  # 2. merge data
+  python3 src/main.py -from_date 2025-09-07 -to_date 2025-09-15 False
+```
 
 
 ## Requirements
