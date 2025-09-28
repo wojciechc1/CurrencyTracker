@@ -11,7 +11,7 @@ def main(data_folder_dir: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Currency Calculator")
-    #parser.add_argument("--data_folder", help="Directory where data is stored")
+    parser.add_argument("--data_folder", help="Directory where data is stored")
     args = parser.parse_args()
 
     main(args.data_folder)

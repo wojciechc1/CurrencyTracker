@@ -8,22 +8,33 @@ import logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
 class DataAPI:
-    def __init__(self, url, name):
+    def __init__(self, url, out_format):
         self.url = url
-        self.file_name = name
-        self.save_dir = self.create_save_dir("data")
+        self.out_format = out_format
 
-    @staticmethod
-    def create_save_dir(folder_path):
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-            logger.info(f"Created folder: {folder_path}")
-        return folder_path
+    #@staticmethod
+    def save_to_file(self, path, data):
+        # checking if path exists and if not then creating one
+        folder = os.path.dirname(path)
+        if not os.path.exists(folder):
+            ans = input(f"Folder '{folder}' does not exist. Create? [y/N]: ").strip().lower()
+            if ans == "y":
+                os.makedirs(folder, exist_ok=True)
+                logger.info(f"Created folder: {folder}")
+            else:
+                logger.warning("Saving to file cancelled by user.")
+                return
+
+        # saving data to the file
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(data)
+        logger.info(f"Saved to {path}")
+
 
     def get_data(self):
         """Download the data from the API"""
@@ -32,6 +43,17 @@ class DataAPI:
         resp.raise_for_status()
         logger.info(f"Downloaded {len(resp.content)} bytes from {self.url}")
         return resp.text
+
+    def get_data_formatted(self, data):
+        if self.out_format == "CSV":
+            formatted = self.get_csv(data)
+        elif self.out_format == "XML":
+            formatted = self.get_xml(data)
+        else:
+            formatted = data # defalt format
+
+        logger.info(f"Successfully converted.")
+        return formatted
 
     @staticmethod
     def get_xml(data):
@@ -53,14 +75,13 @@ class DataAPI:
         """Convert the data to CSV"""
         logger.info(f"Converting data to CSV")
 
-        csv = ''
+        csv = 'date,value\n'
         for item in data:
             date = item.get("Date", "")
             value = str(item.get("Value", ""))
             csv += f"{date},{value}\n"
 
         return csv
-
 
     @abstractmethod
     def parse_data(self, data):
@@ -69,10 +90,9 @@ class DataAPI:
 
 
 class NBPDataAPI(DataAPI):
-    def __init__(self, date_start, date_end):
+    def __init__(self, date_start, date_end, out_format):
         url = f"https://api.nbp.pl/api/exchangerates/rates/A/EUR/{date_start}/{date_end}/?format=xml"
-        name = "nbp"
-        super().__init__(url=url, name=name)
+        super().__init__(url=url, out_format=out_format)
 
     def parse_data(self, data):
         """Parse the data to list of dictionaries"""
@@ -87,10 +107,9 @@ class NBPDataAPI(DataAPI):
 
 
 class ECBDataAPI(DataAPI):
-    def __init__(self, date_start, date_end):
+    def __init__(self, date_start, date_end, out_format):
         url = f"https://data-api.ecb.europa.eu/service/data/EXR/D.PLN.EUR.SP00.A?startPeriod={date_start}&endPeriod={date_end}&format=xml"
-        name = "ecb"
-        super().__init__(url=url, name=name)
+        super().__init__(url=url, out_format=out_format)
 
     def parse_data(self, data):
         """Parse the data to list of dictionaries"""

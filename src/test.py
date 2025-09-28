@@ -1,7 +1,7 @@
 import datetime
+import os
 
 
+folder = os.path.dirname("data/xd/xml")
 
-date_end = datetime.date.today()
-
-print(date_end)
+print(folder)
