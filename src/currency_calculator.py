@@ -53,10 +53,3 @@ class CurrencyCalculator:
 
         logger.info(f"Computed {len(results)} differences")
         return results
-
-
-
-calc = CurrencyCalculator("data/nbp.xml", "data/ecb.xml")
-diffs = calc.compute_difference()
-for d in diffs:
-    print(d["date"], d["diff"])

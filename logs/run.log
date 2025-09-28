@@ -1,0 +1,14 @@
+usage: main.py [-h] [-from_date FROM_DATE] [-to_date TO_DATE] overwrite
+main.py: error: unrecognized arguments: 2025-09-05 False
+usage: main.py [-h] [-from_date FROM_DATE] [-to_date TO_DATE] overwrite
+main.py: error: unrecognized arguments: 2025-09-05 False
+usage: main.py [-h] [-from_date FROM_DATE] [-to_date TO_DATE] overwrite
+main.py: error: unrecognized arguments: 2025-09-05 False
+usage: main.py [-h] [-from_date FROM_DATE] [-to_date TO_DATE] overwrite
+main.py: error: unrecognized arguments: 2025-09-05 True
+2025-09-27 21:59:44 [INFO] Downloading data from https://api.nbp.pl/api/exchangerates/rates/A/EUR/2025-09-07/2025-09-15/?format=xml
+2025-09-27 21:59:44 [INFO] Downloaded 816 bytes from https://api.nbp.pl/api/exchangerates/rates/A/EUR/2025-09-07/2025-09-15/?format=xml
+2025-09-27 21:59:44 [INFO] Downloading data from https://data-api.ecb.europa.eu/service/data/EXR/D.PLN.EUR.SP00.A?startPeriod=2025-09-07&endPeriod=2025-09-15&format=xml
+2025-09-27 21:59:44 [INFO] Downloaded 3559 bytes from https://data-api.ecb.europa.eu/service/data/EXR/D.PLN.EUR.SP00.A?startPeriod=2025-09-07&endPeriod=2025-09-15&format=xml
+2025-09-27 21:59:44 [INFO] Saved data to data/nbp.xml
+2025-09-27 21:59:44 [INFO] Saved data to data/ecb.xml

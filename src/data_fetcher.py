@@ -33,37 +33,34 @@ class DataAPI:
         logger.info(f"Downloaded {len(resp.content)} bytes from {self.url}")
         return resp.text
 
-    def save_data(self, data):
-        """Save the data to the file XML format"""
-        file_path = os.path.join(self.save_dir, f"{self.file_name}.xml")
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-            f.write(data)
-        logger.info(f"Saved data to {file_path}")
+    @staticmethod
+    def get_xml(data):
+        """Convert the data to XML"""
+        logger.info(f"Converting data to XML")
 
-    def merge_data(self, new_data):
-        """Append the data to the file XML format"""
-        file_path = os.path.join(self.save_dir, f"{self.file_name}.xml")
+        xml = '<?xml version="1.0" encoding="UTF-8"?>'
+        xml += '<Rates>'
+        for item in data:
+            date = item.get("Date", "")
+            value = str(item.get("Value", ""))
+            xml += f"<Rate><Date>{date}</Date>"
+            xml += f"<Value>{value}</Value></Rate>"
+        xml += f'</Rates>'
+        return xml
 
-        logger.info(f"Merging new data into {file_path}")
-        tree = ET.parse(file_path)
-        root = tree.getroot()
+    @staticmethod
+    def get_csv(data):
+        """Convert the data to CSV"""
+        logger.info(f"Converting data to CSV")
 
-        existing_dates = {rate.find("Date").text for rate in root.findall("Rate")}
-        logger.debug(f"Existing dates in file: {existing_dates}")
+        csv = ''
+        for item in data:
+            date = item.get("Date", "")
+            value = str(item.get("Value", ""))
+            csv += f"{date},{value}\n"
 
-        new_root = ET.fromstring(new_data)
+        return csv
 
-        added = 0
-        for rate in new_root.findall("Rate"):
-            date = rate.find("Date").text
-            if date not in existing_dates:
-                root.append(rate)
-                added += 1
-        # update file
-        tree = ET.ElementTree(root)
-        tree.write(file_path, encoding="utf-8", xml_declaration=True)
-        logger.info(f"Merged {added} new records into {file_path}")
 
     @abstractmethod
     def parse_data(self, data):
@@ -78,16 +75,15 @@ class NBPDataAPI(DataAPI):
         super().__init__(url=url, name=name)
 
     def parse_data(self, data):
-        """Parse the data to simple XML format"""
+        """Parse the data to list of dictionaries"""
         tree = ET.fromstring(data)
         results = []
         for rate in tree.findall(".//Rate"):
             date = rate.find("EffectiveDate").text
             value = float(rate.find("Mid").text)
-            results.append(f"<Rate><Date>{date}</Date><Value>{value}</Value></Rate>")
+            results.append({'Date': date, 'Value': value})
 
-        xml_parsed = "<Rates>\n" + "\n".join(results) + "\n</Rates>"
-        return xml_parsed
+        return results
 
 
 class ECBDataAPI(DataAPI):
@@ -97,14 +93,13 @@ class ECBDataAPI(DataAPI):
         super().__init__(url=url, name=name)
 
     def parse_data(self, data):
-        """Parse the data to simple XML format"""
+        """Parse the data to list of dictionaries"""
         ns = {'gen': 'http://www.sdmx.org/resources/sdmxml/schemas/v2_1/data/generic'}
         tree = ET.fromstring(data)
         results = []
         for obs in tree.findall(".//gen:Obs", ns):
             date = obs.find("gen:ObsDimension", ns).attrib['value']
             value = float(obs.find("gen:ObsValue", ns).attrib['value'])
-            results.append(f"<Rate><Date>{date}</Date><Value>{value}</Value></Rate>")
+            results.append({'Date': date, 'Value': value})
 
-        xml_parsed = "<Rates>\n" + "\n".join(results) + "\n</Rates>"
-        return xml_parsed
+        return results
