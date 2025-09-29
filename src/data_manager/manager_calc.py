@@ -49,7 +49,7 @@ class ManagerCalc(DataManager):
         with open(file_path, newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                data.append({"date": row["date"], "value": float(row["value"])})
+                data.append({"date": row["Date"], "value": float(row["Value"])})
         logger.info(f"Loaded {len(data)} records from {file_path}")
         return data
 
