@@ -21,11 +21,10 @@ def main(date_start: str, date_end: str, source, path: str, out_format: str):
     # parse to list of dicts
     rates = bank_api.parse_data(data)
 
-
     formatted = bank_api.get_data_formatted(rates)
 
     if path is not None:
-        bank_api.save_to_file(path, formatted)
+        bank_api.save_to_file(formatted, path)
     else:
         print(formatted)
 
