@@ -1,4 +1,4 @@
-# Currency Tracker with Linux
+# Currency Tracker
 
 Currency Tracker is a Python project for fetching historical and current exchange rates from multiple sources (NBP and ECB), processing the data, and saving it in CSV or XML formats. It also allows calculating differences, min/max values, and percentage deviations between sources.
 ## Features
@@ -32,7 +32,7 @@ python3 src/calc.py --data_folder data --operation 2 --path calculations/minmax.
 ````
 | Min-max                              | Percentage                           |
 |--------------------------------------|--------------------------------------|
-| ![Example NBP CSV](images/img_3.png) | ![Example ECB CSV](images/img_2.png) |
+| ![Example NBP CSV](images/img_2.png) | ![Example ECB CSV](images/img_3.png) |
 
 ## Quick Start
 1. Fetch exchange rates for your desired date range:
